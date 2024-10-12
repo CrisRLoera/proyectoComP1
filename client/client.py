@@ -1,37 +1,48 @@
 import socket
+import threading
 
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def run_client():
-    # create a socket object
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_ip = "127.0.0.1"  # dirección IP del server
+server_port = 10000  # puerto del servidor
+# Establecer conexión con el server
 
-    server_ip = "127.0.0.1"  # replace with the server's IP address
-    server_port = 8000  # replace with the server's port number
-    # establish connection with server
+try:
     client.connect((server_ip, server_port))
+    conectado = True
+except client.error as e:
+    conectado = False
 
+def receive_messages():
     try:
         while True:
-            # get input message from user and send it to the server
-            msg = input("Enter message: ")
-            client.send(msg.encode("utf-8")[:1024])
-
-            # receive message from the server
+            # Recibidor de mensajes del server
             response = client.recv(1024)
             response = response.decode("utf-8")
 
-            # if server sent us "closed" in the payload, we break out of
-            # the loop and close our socket
+
+            # Cierre de cliente
             if response.lower() == "closed":
                 break
 
-            print(f"Received: {response}")
+            print(f"{response}")
     except Exception as e:
         print(f"Error: {e}")
     finally:
-        # close client socket (connection to the server)
+        # Cerrar conexión del cliente con el servidor
         client.close()
+        conectado = False
         print("Connection to server closed")
 
+# Función para enviar mensajes al servidor
+def send_message():
+    while conectado:
+        message = f'{input("")}'
+        client.send(message.encode('utf-8'))
 
-run_client()
+# Crear y arrancar hilos para enviar y recibir mensajes
+receive_thread = threading.Thread(target=receive_messages)
+receive_thread.start()
+
+send_thread = threading.Thread(target=send_message)
+send_thread.start()
