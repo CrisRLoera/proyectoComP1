@@ -30,7 +30,7 @@ def handle_client(client_socket, addr):
 
 def run_server():
     server_ip = "127.0.0.1"  # dirección IP
-    port = 10000  # puerto
+    port = 8000  # puerto
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Conexion del socket a por puerto y dirección
