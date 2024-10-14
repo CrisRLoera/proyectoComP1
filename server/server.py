@@ -16,7 +16,7 @@ def handle_client(client_socket, addr):
             if request.lower() == "close":
                 client_socket.send("closed".encode("utf-8"))
                 clients.remove(client_socket)
-                transmit(f"{addr[1]} a dejado el chat".encode('utf-8'))
+                transmit(f"{addr[1]} ha dejado el chat".encode('utf-8'))
                 break
             print(f"Received: {request} from {addr[1]}")
             # Retransmición a los demas clientes
