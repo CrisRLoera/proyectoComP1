@@ -42,6 +42,9 @@ def receive_messages():
                 text_area.configure(state="disabled")
             except socket.timeout:
                 continue  # Si no recibe nada, vuelve a intentar
+            except OSError:
+                # Capturar el error si el socket ya está cerrado
+                break
     except Exception as e:
         print(f"Error en la recepción de mensajes: {e}")
     finally:
@@ -52,8 +55,11 @@ def receive_messages():
 def send_message():
     message = message_entry.get()
     if message:
-        client.send(message.encode('utf-8'))
-        message_entry.delete(0, ctk.END)
+        try:
+            client.send(message.encode('utf-8'))
+            message_entry.delete(0, ctk.END)
+        except Exception as e:
+            print(f"Error al enviar el mensaje: {e}")
 
 # Función para cerrar la aplicación
 def close_app():
@@ -67,11 +73,13 @@ def close_app():
         print("Cliente cerrado manualmente")
         app.destroy()  # Cerrar la interfaz
 
+# Configurar el evento para cerrar la ventana
+app.protocol("WM_DELETE_WINDOW", close_app)
+
 # Configuración de la UI
 text_area = ctk.CTkTextbox(app)
 text_area.pack(pady=10, padx=10, fill=ctk.BOTH, expand=True)
 text_area.configure(state="disabled")
-
 
 message_entry = ctk.CTkEntry(app)
 message_entry.pack(pady=10, padx=10, fill=ctk.X)
